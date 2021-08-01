@@ -95,6 +95,9 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
                 adj_matrix[i * len(columns) + j, 0] = index[i]
                 adj_matrix[i * len(columns) + j, 1] = columns[j]
                 adj_matrix[i * len(columns) + j, 2] = cos[i, j]
+
+        print('ddd')
+        print(adj_matrix.shape)
         adj_matrix[:, 2] = list(map(clip, adj_matrix[:, 2]))
         if len(seed_list1) != 0:
             adj_matrix2 = caculate_jaccard_coefficient(G1, G2, seed_list1, seed_list2, index, columns)
