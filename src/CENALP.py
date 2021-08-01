@@ -102,8 +102,10 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
         if len(seed_list1) != 0:
             adj_matrix2 = caculate_jaccard_coefficient(G1, G2, seed_list1, seed_list2, index, columns)
             adj_matrix[:, 2] *= adj_matrix2[:, 2]
-            
+
+        print(adj_matrix)
         adj_matrix = adj_matrix[np.argsort(-adj_matrix[:, 2])]
+        print(adj_matrix)
 
         seed1 = []
         seed2 = []
