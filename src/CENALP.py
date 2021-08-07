@@ -96,16 +96,12 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
                 adj_matrix[i * len(columns) + j, 1] = columns[j]
                 adj_matrix[i * len(columns) + j, 2] = cos[i, j]
 
-        print('ddd')
-        print(adj_matrix.shape)
         adj_matrix[:, 2] = list(map(clip, adj_matrix[:, 2]))
         if len(seed_list1) != 0:
             adj_matrix2 = caculate_jaccard_coefficient(G1, G2, seed_list1, seed_list2, index, columns)
             adj_matrix[:, 2] *= adj_matrix2[:, 2]
 
-        print(adj_matrix)
         adj_matrix = adj_matrix[np.argsort(-adj_matrix[:, 2])]
-        print(adj_matrix)
 
         seed1 = []
         seed2 = []
@@ -143,20 +139,21 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
             except:
                 continue
         print('All seed accuracy : %.2f%%'%(100 * count / len(seed_list1)))
+
+        count -= seed_list_num
+        precision = 100 * count / (len(seed_list1) - seed_list_num)
+        recall = 100 * count / (len(alignment_dict) - seed_list_num)
+
         pred1, pred2 = seed_link_lr(model, G1, G2, seed_list1, seed_list2,
                                     mul, test_edges_final1, test_edges_final2, alignment_dict, alignment_dict_reversed)
 
         G1.add_edges_from(pred1)
         G2.add_edges_from(pred2)
-        
+        print('Add seed links: {}'.format(len(pred1) + len(pred2)))
+
         pred_list1 += list([[alignment_dict[edge[0]], alignment_dict[edge[1]]] for edge in pred1])
         pred_list2 += list([[alignment_dict_reversed[edge[0]], alignment_dict_reversed[edge[1]]] for edge in pred2])
-        print('Add seed links: {}'.format(len(pred1) + len(pred2)))
-        
-        count -= seed_list_num
-        precision = 100 * count / (len(seed_list1) - seed_list_num)
-        recall = 100 * count / (len(alignment_dict) - seed_list_num)
-        
+
         sub1 = np.sum([G1.has_edge(edge[0], edge[1]) for edge in pred_list2])
         sub2 = np.sum([G2.has_edge(edge[0], edge[1]) for edge in pred_list1])
         if (len(pred_list2) + len(pred_list1)) == 0:
