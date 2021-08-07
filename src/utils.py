@@ -392,8 +392,14 @@ def seed_link_lr(model, G1, G2, seed_list1, seed_list2, mul, test_edges_final1, 
     val_preds = val_preds1+val_preds2
     val_labels = actual_list1+actual_list2
 
-    roc_score = roc_auc_score(val_labels, val_preds)
-    print('ROC SCORE : {}'.format(roc_score))
+    if len(val_preds) != 0:
+        if len(val_labels) != 0:
+            roc_score = roc_auc_score(val_labels, val_preds)
+            print('ROC SCORE : {}'.format(roc_score))
+        else:
+            print('Empty val_labels')
+    else:
+        print('Empty val_preds')
 
     '''
     pred1 = [(alignment_dict[edge[0]], alignment_dict[edge[1]]) for edge in pred1]
