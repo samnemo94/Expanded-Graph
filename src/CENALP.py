@@ -12,8 +12,8 @@ data_folder = '../graph/'
 attribute_folder = '../attribute/'
 alignment_folder = '../alignment/'
 
-def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_reversed, 
-           layer, align_train_prop, alpha, c, multi_walk):
+def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_reversed,
+           layer, align_train_prop, alpha, c, multi_walk, neg_sampling=False):
     iteration = 1
     anchor = 0
     mul = int(np.max([np.max(G1.nodes()), np.max(G2.nodes())]))
@@ -76,7 +76,10 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
         walks = LineSentence('random_walks.txt')
         print('finished!')
         print('embedding...', end='')
-        model = Word2Vec(walks, size=64, window=5, min_count=0, hs=1, sg=1, workers=32, iter=5)
+        if neg_sampling:
+            model = Word2Vec(walks, size=64, window=5, min_count=0, hs=0, negative=10, sg=1, workers=32, iter=5)
+        else:
+            model = Word2Vec(walks, size=64, window=5, min_count=0, hs=1, sg=1, workers=32, iter=5)
         print('finished!')
         if len(columns) == 0 or len(index) == 0:
             break
