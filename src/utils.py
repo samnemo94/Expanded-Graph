@@ -372,7 +372,7 @@ def seed_link_lr(model, G1, G2, seed_list1, seed_list2, mul, test_edges_final1, 
     val_labels = []
     if len(embedding1) != 0:
         val_preds1 = edge_classifier.predict_proba(embedding1)[:, 1]
-        val_preds = val_preds1
+        val_preds = list(val_preds1)
         pred1 = test_edges1[val_preds1 > 0.5]
         actual_list1 = list([[alignment_dict[edge[0]], alignment_dict[edge[1]]] for edge in test_edges1])
         actual_list1 = list(G2.has_edge(edge[0], edge[1]) for edge in actual_list1)
@@ -381,32 +381,17 @@ def seed_link_lr(model, G1, G2, seed_list1, seed_list2, mul, test_edges_final1, 
         pred1 = []
     if len(embedding2) != 0:
         val_preds2 = edge_classifier.predict_proba(embedding2)[:, 1]
-        if len(val_preds) == 0:
-            val_preds = val_preds2
-        else:
-            val_preds += val_preds2
+        val_preds += list(val_preds2)
         actual_list2 = list(
             [[alignment_dict_reversed[edge[0]], alignment_dict_reversed[edge[1]]] for edge in test_edges2])
         actual_list2 = list(G1.has_edge(edge[0], edge[1]) for edge in actual_list2)
-        if len(val_labels) == 0:
-            val_labels = actual_list2
-        else:
-            val_labels += actual_list2
+        val_labels += actual_list2
         pred2 = test_edges2[val_preds2 > 0.5]
     else:
         pred2 = []
 
-
     if len(val_preds) != 0:
         if len(val_labels) != 0:
-            print(len(val_preds1))
-            print((val_preds1))
-            print(len(val_preds2))
-            print((val_preds2))
-            print(len(actual_list1))
-            print((actual_list1))
-            print(len(actual_list2))
-            print((actual_list2))
             try:
                 roc_score = roc_auc_score(val_labels, val_preds)
                 print('ROC SCORE : {}'.format(roc_score))
