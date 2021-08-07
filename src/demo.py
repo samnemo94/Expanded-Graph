@@ -53,6 +53,7 @@ def parse_args():
     return parser.parse_args()
 
 def main(args):
+    print(args)
     alignment_dict, alignment_dict_reversed = read_alignment(args.alignment_folder, args.filename)
     G1, G2 = loadG(args.data_folder, args.filename)
     attribute, attr1, attr2 = read_attribute(args.attribute_folder, args.filename, G1, G2)
