@@ -13,7 +13,7 @@ from .static_graph_embedding import StaticGraphEmbedding
 class Bernoulli(StaticGraphEmbedding):
 
     def __init__(self, embedding_dimension=64, decoder='sigmoid', similarity_measure="adjacency",
-                 learning_rate=1e-2, weight_decay=1e-7, display_step=100):
+                 learning_rate=1e-2, weight_decay=1e-7, display_step=3000):
         '''
         Parameters
         ----------

@@ -52,6 +52,10 @@ def parse_args():
                         help="Whether to use multi-processing")
     parser.add_argument('--neg_sampling', type=bool, default=False,
                         help="Use Negative Sampling")
+    parser.add_argument('--embedding_method_class', type=str, default='',
+                        help="Embedding Class")
+    parser.add_argument('--embedding_method_kind', type=str, default='',
+                        help="Embedding Kind")
     return parser.parse_args()
 
 def main(args):
@@ -60,7 +64,7 @@ def main(args):
     G1, G2 = loadG(args.data_folder, args.filename)
     attribute, attr1, attr2 = read_attribute(args.attribute_folder, args.filename, G1, G2)
     S, precision, seed_l1, seed_l2 = CENALP(G1, G2, args.q, attr1, attr2, attribute, alignment_dict, alignment_dict_reversed, 
-       args.layer, args.align_train_prop, args.alpha, args.c, args.multi_walk,args.neg_sampling)
+       args.layer, args.align_train_prop, args.alpha, args.c, args.multi_walk,args.neg_sampling,args.embedding_method_class,args.embedding_method_kind)
 if __name__ == '__main__':
     args = parse_args()
     main(args)

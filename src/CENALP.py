@@ -4,6 +4,9 @@ from walks import multi_simulate_walks, single_simulate_walks
 from sklearn.metrics.pairwise import cosine_similarity
 import warnings
 from embedding.bernoulli import Bernoulli
+from embedding.kl import KL
+from embedding.matrix_factorization import MatrixFactorization
+from scipy import sparse
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
@@ -17,7 +20,7 @@ alignment_folder = '../alignment/'
 
 
 def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_reversed,
-           layer, align_train_prop, alpha, c, multi_walk, neg_sampling=False):
+           layer, align_train_prop, alpha, c, multi_walk, neg_sampling=False, embedding_method_class = '', embedding_method_kind = ''):
     iteration = 1
     anchor = 0
     mul = int(np.max([np.max(G1.nodes()), np.max(G2.nodes())]))
@@ -91,11 +94,18 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
         print('big_graph.sum()')
         print(big_graph.sum())
 
-        model_01 = Bernoulli(embedding_dimension=64, decoder='sigmoid')
+        if embedding_method_class == 'Bernoulli':
+            model_01 = Bernoulli(embedding_dimension=64, decoder=embedding_method_kind)
+        elif embedding_method_class == 'KL':
+            model_01 = KL(embedding_dimension=64, decoder='softmax', similarity_measure=embedding_method_kind)
+        elif embedding_method_class == 'MatrixFactorization':
+            model_01 = MatrixFactorization(embedding_dimension=64, similarity_measure=embedding_method_kind)
+
         model_01.set_summary_folder('results_embedding/')
         model_01.reset_epoch()
 
-        model_01.setup_model_input(big_graph)
+        s_big_graph = sparse.csr_matrix(big_graph)  # Here's the initialization of the sparse matrix.
+        model_01.setup_model_input(s_big_graph)
         emb = model_01.learn_embedding(10000)
 
         embedding1 = np.array([emb[x] for x in range(len(G1.nodes()))])
