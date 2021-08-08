@@ -16,7 +16,7 @@ sys.path.insert(0, '../')
 import numpy as np
 import scipy.sparse as sp
 import torch
-from utils import graph_util
+import graph_util
 
 #helper:
 def compute_degree_matrix(adj_np):
