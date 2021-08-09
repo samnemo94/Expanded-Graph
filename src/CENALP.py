@@ -71,21 +71,25 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
                 structing(layer, G1, G2, G1_degree_dict, G2_degree_dict, attribute, alpha, c)
             print('finished!')
 
-        big_graph = np.zeros((len(G1.nodes()) + len(G2.nodes()), len(G1.nodes()) + len(G2.nodes())))
+        G1_nodes_numb = len(G1.nodes())
+        G2_nodes_numb = len(G2.nodes())
+        big_graph = np.zeros((G1_nodes_numb + G2_nodes_numb, G1_nodes_numb + G2_nodes_numb))
 
         for i in range(big_graph.shape[0]):
             for j in range(i + 1, big_graph.shape[1]):
                 res = 0
-                if i < len(G1.nodes()) and j < len(G1.nodes()):
+                if i < G1_nodes_numb and j < G1_nodes_numb:
                     res = G1.has_edge(list(G1.nodes())[i], list(G1.nodes())[j])
-                elif i >= len(G1.nodes()) and j >= len(G1.nodes()):
-                    res = G2.has_edge(list(G2.nodes())[i-len(G1.nodes())], list(G2.nodes())[j-len(G1.nodes())])
+                elif i >= G1_nodes_numb and j >= G1_nodes_numb:
+                    res = G2.has_edge(list(G2.nodes())[i-G1_nodes_numb], list(G2.nodes())[j-G1_nodes_numb])
                 else:
                     n1 = list(G1.nodes())[i]
-                    n2 = list(G2.nodes())[j - len(G1.nodes())]
+                    n2 = list(G2.nodes())[j - G1_nodes_numb]
                     try:
                         if seed_list2[seed_list1.index(n1)] == n2:
                             res = 1
+                        else:
+                            res = n2 in struc_neighbor1[n1] or n1 in struc_neighbor2[n2]
                     except:
                         res = n2 in struc_neighbor1[n1] or n1 in struc_neighbor2[n2]
                 big_graph[i][j] = res
@@ -107,8 +111,8 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
         model_01.setup_model_input(s_big_graph)
         emb = model_01.learn_embedding(10000)
 
-        embedding1 = np.array([emb[x] for x in range(len(G1.nodes()))])
-        embedding2 = np.array([emb[x] for x in range(len(G1.nodes()),len(G1.nodes())+len(G2.nodes()))])
+        embedding1 = np.array([emb[list(G1.nodes()).index(x)] for x in index])
+        embedding2 = np.array([emb[list(G2.nodes()).index(x) + G1_nodes_numb] for x in columns])
 
         # print('walking...', end='')
         # if multi_walk == True:
