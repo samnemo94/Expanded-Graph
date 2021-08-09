@@ -198,7 +198,7 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
         precision = 100 * count / (len(seed_list1) - seed_list_num)
         recall = 100 * count / (len(alignment_dict) - seed_list_num)
 
-        pred1, pred2 = seed_link_lr(embedding1,embedding2, G1, G2, seed_list1, seed_list2,
+        pred1, pred2 = seed_link_lr(emb, G1, G2, seed_list1, seed_list2,
                                     mul, test_edges_final1, test_edges_final2, alignment_dict, alignment_dict_reversed)
 
         G1.add_edges_from(pred1)
