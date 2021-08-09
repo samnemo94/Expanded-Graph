@@ -204,10 +204,9 @@ class Bernoulli(StaticGraphEmbedding):
             loss.backward()
             opt.step()
 
-            if epoch % self._display_step == 0 and self._summary_path:
+            if epoch % self._display_step == 0:
                 print(f'Epoch {epoch:4d}, loss = {loss.item():.5f}')
-                self._writer.add_scalar('Loss/train', loss.item(), epoch)
-                
+
             now= loss.item()    
             if (abs(prev-now) < diff):
                 print(f'Epoch {epoch:4d}, loss = {loss.item():.5f}')
