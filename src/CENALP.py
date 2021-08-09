@@ -101,7 +101,6 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
         elif embedding_method_class == 'MatrixFactorization':
             model_01 = MatrixFactorization(embedding_dimension=64, similarity_measure=embedding_method_kind)
 
-        model_01.set_summary_folder('results_embedding/')
         model_01.reset_epoch()
 
         s_big_graph = sparse.csr_matrix(big_graph)  # Here's the initialization of the sparse matrix.
