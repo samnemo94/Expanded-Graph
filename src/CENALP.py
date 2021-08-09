@@ -111,9 +111,6 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
         model_01.setup_model_input(s_big_graph)
         emb = model_01.learn_embedding(10000)
 
-        embedding1 = np.array([emb[list(G1.nodes()).index(x)] for x in index])
-        embedding2 = np.array([emb[list(G2.nodes()).index(x) + G1_nodes_numb] for x in columns])
-
         # print('walking...', end='')
         # if multi_walk == True:
         #     multi_simulate_walks(G1, G2, q, struc_neighbor1, struc_neighbor2,
@@ -141,6 +138,9 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
 
         # embedding1 = np.array([model.wv[str(x)] for x in index])
         # embedding2 = np.array([model.wv[str(x + mul + 1)] for x in columns])
+
+        embedding1 = np.array([emb[list(G1.nodes()).index(x)] for x in index])
+        embedding2 = np.array([emb[list(G2.nodes()).index(x) + G1_nodes_numb] for x in columns])
 
         cos = cosine_similarity(embedding1, embedding2)
         adj_matrix = np.zeros((len(index) * len(columns), 3))
