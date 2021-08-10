@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import time
+
 from CENALP import CENALP
 import pandas as pd
 from utils import *
@@ -63,8 +65,11 @@ def main(args):
     alignment_dict, alignment_dict_reversed = read_alignment(args.alignment_folder, args.filename)
     G1, G2 = loadG(args.data_folder, args.filename)
     attribute, attr1, attr2 = read_attribute(args.attribute_folder, args.filename, G1, G2)
+    start_time = time.time()
     S, precision, seed_l1, seed_l2 = CENALP(G1, G2, args.q, attr1, attr2, attribute, alignment_dict, alignment_dict_reversed, 
        args.layer, args.align_train_prop, args.alpha, args.c, args.multi_walk,args.neg_sampling,args.embedding_method_class,args.embedding_method_kind)
+    print("--- %s seconds ---" % (time.time() - start_time))
+
 if __name__ == '__main__':
     args = parse_args()
     main(args)

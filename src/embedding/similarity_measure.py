@@ -141,6 +141,7 @@ def compute_ppr(adj_np, alpha = 0.1 ):
 
 def compute_sum_power_tran(adj_np, T = 10 ):
     adj_gpu=torch.FloatTensor(adj_np.toarray()).cuda()
+`    #P=D^−1A
     matrix = compute_transition(adj_np)
     P = torch.zeros_like(matrix).cuda()
     for i in range(0,T+1):
