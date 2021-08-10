@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from utils import *
 from walks import multi_simulate_walks, single_simulate_walks
 from sklearn.metrics.pairwise import cosine_similarity
@@ -73,27 +74,36 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
 
         G1_nodes_numb = len(G1.nodes())
         G2_nodes_numb = len(G2.nodes())
-        big_graph = np.zeros((G1_nodes_numb + G2_nodes_numb, G1_nodes_numb + G2_nodes_numb))
 
-        for i in range(big_graph.shape[0]):
-            for j in range(i + 1, big_graph.shape[1]):
-                res = 0
-                if i < G1_nodes_numb and j < G1_nodes_numb:
-                    res = G1.has_edge(list(G1.nodes())[i], list(G1.nodes())[j])
-                elif i >= G1_nodes_numb and j >= G1_nodes_numb:
-                    res = G2.has_edge(list(G2.nodes())[i-G1_nodes_numb], list(G2.nodes())[j-G1_nodes_numb])
-                else:
-                    n1 = list(G1.nodes())[i]
-                    n2 = list(G2.nodes())[j - G1_nodes_numb]
-                    try:
-                        if seed_list2[seed_list1.index(n1)] == n2:
-                            res = 1
-                        else:
-                            res = n2 in struc_neighbor1[n1] or n1 in struc_neighbor2[n2]
-                    except:
-                        res = n2 in struc_neighbor1[n1] or n1 in struc_neighbor2[n2]
-                big_graph[i][j] = res
-                big_graph[j][i] = res
+        big_graph = np.zeros((G1_nodes_numb + G2_nodes_numb, G1_nodes_numb + G2_nodes_numb))
+        G1_dict = {}
+        for i in range(len(list(G1.nodes()))):
+            G1_dict[list(G1.nodes())[i]] = i
+        G2_dict = {}
+        for i in range(len(list(G2.nodes()))):
+            G2_dict[list(G2.nodes())[i]] = i
+
+        for edge in G1.edges():
+            big_graph[G1_dict[edge[0]]][G1_dict[edge[1]]] = 1
+            big_graph[G1_dict[edge[1]]][G1_dict[edge[0]]] = 1
+
+        for edge in G2.edges():
+            big_graph[G2_dict[edge[0]]+G1_nodes_numb][G2_dict[edge[1]]+G1_nodes_numb] = 1
+            big_graph[G2_dict[edge[1]]+G1_nodes_numb][G2_dict[edge[0]]+G1_nodes_numb] = 1
+
+        for i in range(len(seed_list1)):
+            big_graph[G1_dict[seed_list1[i]]][G2_dict[seed_list2[i]]+G1_nodes_numb] = 1
+            big_graph[G2_dict[seed_list2[i]]+G1_nodes_numb][G1_dict[seed_list1[i]]] = 1
+
+        for n1 in struc_neighbor1:
+            for n2 in struc_neighbor1[n1]:
+                big_graph[G1_dict[n1]][G2_dict[n2]+G1_nodes_numb] = 1
+                big_graph[G2_dict[n2]+G1_nodes_numb][G1_dict[n1]] = 1
+
+        for n2 in struc_neighbor2:
+            for n1 in struc_neighbor2[n2]:
+                big_graph[G1_dict[n1]][G2_dict[n2]+G1_nodes_numb] = 1
+                big_graph[G2_dict[n2]+G1_nodes_numb][G1_dict[n1]] = 1
 
         print('big_graph.sum()')
         print(big_graph.sum())
