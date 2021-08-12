@@ -457,7 +457,7 @@ def evaluate_lp(G1, G2, model, mul):
                                   model.wv[str(edge[0] + mul + 1)] * model.wv[str(edge[1] + mul + 1)]]) for edge in G2_train_edges_true]
     embedding2 += [np.concatenate([model.wv[str(edge[0] + mul + 1)], model.wv[str(edge[1] + mul + 1)],
                                   model.wv[str(edge[0] + mul + 1)] * model.wv[str(edge[1] + mul + 1)]]) for edge in G2_train_edges_false]
-    label2 = [1] * (len(len(G2_train_edges_true) + len(G2_train_edges_false))) + [0] * len(G2_train_edges_false)
+    label2 = [1] * (len(G2_train_edges_true) + len(G2_train_edges_false)) + [0] * len(G2_train_edges_false)
 
     embedding = embedding1 + embedding2
     label = label1 + label2
