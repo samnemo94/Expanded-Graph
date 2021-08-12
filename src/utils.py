@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-import networkx
-import numpy
-import pandas
-import pandas as pd
-import numpy as np
+import random
+
 import networkx as nx
+import numpy as np
+import pandas as pd
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score, precision_score, recall_score
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.metrics import roc_auc_score, average_precision_score, roc_curve
 
 
 def loadG(data_folder, filename):
@@ -334,6 +333,28 @@ def edge_sample(G):
     edges = edges + test_edges_false
     return edges
 
+def edge_sample_evaluate(G, ratio):
+    edges = list(G.edges())
+    test_edges_false = []
+    while len(test_edges_false) < G.number_of_edges():
+        node1 = np.random.choice(G.nodes())
+        node2 = np.random.choice(G.nodes())
+        if node1 == node2:
+            continue
+        if G.has_edge(node1, node2):
+            continue
+        test_edges_false.append([min(node1, node2), max(node1, node2)])
+
+    random.shuffle(edges)
+    random.shuffle(test_edges_false)
+
+    train_edges_true = edges[:int(len(edges)*ratio)]
+    test_edges_true = edges[int(len(edges)*ratio):]
+    train_edges_false = test_edges_false[:int(len(test_edges_false)*ratio)]
+    test_edges_false = test_edges_false[int(len(test_edges_false)*ratio):]
+
+    return train_edges_true, train_edges_false, test_edges_true, test_edges_false
+
 
 def seed_link_lr(model, G1, G2, seed_list1, seed_list2, mul, test_edges_final1, test_edges_final2, alignment_dict,
                  alignment_dict_reversed):
@@ -372,11 +393,11 @@ def seed_link_lr(model, G1, G2, seed_list1, seed_list2, mul, test_edges_final1, 
     val_labels = []
     if len(embedding1) != 0:
         val_preds1 = edge_classifier.predict_proba(embedding1)[:, 1]
-        val_preds = list(val_preds1)
         pred1 = test_edges1[val_preds1 > 0.5]
         actual_list1 = list([[alignment_dict[edge[0]], alignment_dict[edge[1]]] for edge in test_edges1])
         actual_list1 = list(G2.has_edge(edge[0], edge[1]) for edge in actual_list1)
         val_labels = actual_list1
+        val_preds = list(val_preds1)
     else:
         pred1 = []
     if len(embedding2) != 0:
@@ -422,3 +443,51 @@ def seed_link_lr(model, G1, G2, seed_list1, seed_list2, mul, test_edges_final1, 
     pred2 = [(alignment_dict[edge[0]], alignment_dict[edge[1]]) for edge in pred2]
     '''
     return pred1, pred2
+
+def evaluate_lp(G1, G2, model, mul):
+    G1_train_edges_true, G1_train_edges_false, G1_test_edges_true, G1_test_edges_false = edge_sample_evaluate(G1, 0.75)
+    embedding1 = [np.concatenate([model.wv[str(edge[0])], model.wv[str(edge[1])],
+                                  model.wv[str(edge[0])] * model.wv[str(edge[1])]]) for edge in G1_train_edges_true]
+    embedding1 += [np.concatenate([model.wv[str(edge[0])], model.wv[str(edge[1])],
+                                   model.wv[str(edge[0])] * model.wv[str(edge[1])]]) for edge in G1_train_edges_false]
+    label1 = [1] * (len(G1_train_edges_true) + len(G1_train_edges_false)) + [0] * len(G1_train_edges_false)
+
+    G2_train_edges_true, G2_train_edges_false, G2_test_edges_true, G2_test_edges_false = edge_sample_evaluate(G2,0.75)
+    embedding2 = [np.concatenate([model.wv[str(edge[0] + mul + 1)], model.wv[str(edge[1] + mul + 1)],
+                                  model.wv[str(edge[0] + mul + 1)] * model.wv[str(edge[1] + mul + 1)]]) for edge in G2_train_edges_true]
+    embedding2 += [np.concatenate([model.wv[str(edge[0] + mul + 1)], model.wv[str(edge[1] + mul + 1)],
+                                  model.wv[str(edge[0] + mul + 1)] * model.wv[str(edge[1] + mul + 1)]]) for edge in G2_train_edges_false]
+    label2 = [1] * (len(len(G2_train_edges_true) + len(G2_train_edges_false))) + [0] * len(G2_train_edges_false)
+
+    embedding = embedding1 + embedding2
+    label = label1 + label2
+
+    edge_classifier = LogisticRegression(solver='liblinear', random_state=0)
+    edge_classifier.fit(np.array(embedding), label)
+
+    # testing
+    embedding1 = [np.concatenate([model.wv[str(edge[0])], model.wv[str(edge[1])],
+                                  model.wv[str(edge[0])] * model.wv[str(edge[1])]]) for edge in G1_test_edges_true]
+    embedding1 += [np.concatenate([model.wv[str(edge[0])], model.wv[str(edge[1])],
+                                   model.wv[str(edge[0])] * model.wv[str(edge[1])]]) for edge in G1_test_edges_false]
+    label1 = [1] * (len(G1_test_edges_true) + len(G1_test_edges_false)) + [0] * len(G1_test_edges_false)
+
+    embedding2 = [np.concatenate([model.wv[str(edge[0] + mul + 1)], model.wv[str(edge[1] + mul + 1)],
+                                  model.wv[str(edge[0] + mul + 1)] * model.wv[str(edge[1] + mul + 1)]]) for edge in G2_test_edges_true]
+    embedding2 += [np.concatenate([model.wv[str(edge[0] + mul + 1)], model.wv[str(edge[1] + mul + 1)],
+                                  model.wv[str(edge[0] + mul + 1)] * model.wv[str(edge[1] + mul + 1)]]) for edge in G2_test_edges_false]
+    label2 = [1] * (len(G2_test_edges_true) + len(G2_test_edges_false)) + [0] * len(G2_test_edges_false)
+
+    embedding = embedding1 + embedding2
+    label = label1 + label2
+
+    val_preds = edge_classifier.predict_proba(embedding)[:, 1]
+    auc_score = roc_auc_score(label, val_preds)
+    print('LP AUC Score : {}'.format(auc_score), end='\t')
+
+    for i in range(len(val_preds)):
+        val_preds[i] = round(val_preds[i])
+    precision = precision_score(label,val_preds)
+    recall = recall_score(label,val_preds)
+    print('LP PRECISION : {}'.format(precision), end='\t')
+    print('LP RECALL : {}'.format(recall), end='\t')
