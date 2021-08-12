@@ -91,19 +91,23 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
             big_graph[G2_dict[edge[0]]+G1_nodes_numb][G2_dict[edge[1]]+G1_nodes_numb] = 1
             big_graph[G2_dict[edge[1]]+G1_nodes_numb][G2_dict[edge[0]]+G1_nodes_numb] = 1
 
+        for n1 in struc_neighbor1:
+            iii = 0
+            for n2 in struc_neighbor1[n1]:
+                big_graph[G1_dict[n1]][G2_dict[n2]+G1_nodes_numb] = max(big_graph[G1_dict[n1]][G2_dict[n2]+G1_nodes_numb],struc_neighbor_sim1[n1][iii])
+                big_graph[G2_dict[n2]+G1_nodes_numb][G1_dict[n1]] = max(big_graph[G2_dict[n2]+G1_nodes_numb][G1_dict[n1]],struc_neighbor_sim1[n1][iii])
+                iii+=1
+
+        for n2 in struc_neighbor2:
+            iii = 0
+            for n1 in struc_neighbor2[n2]:
+                big_graph[G1_dict[n1]][G2_dict[n2]+G1_nodes_numb] = max(big_graph[G1_dict[n1]][G2_dict[n2]+G1_nodes_numb], struc_neighbor_sim2[n2][iii])
+                big_graph[G2_dict[n2]+G1_nodes_numb][G1_dict[n1]] = max(big_graph[G2_dict[n2]+G1_nodes_numb][G1_dict[n1]], struc_neighbor_sim2[n2][iii])
+                iii+=1
+
         for i in range(len(seed_list1)):
             big_graph[G1_dict[seed_list1[i]]][G2_dict[seed_list2[i]]+G1_nodes_numb] = 1
             big_graph[G2_dict[seed_list2[i]]+G1_nodes_numb][G1_dict[seed_list1[i]]] = 1
-
-        for n1 in struc_neighbor1:
-            for n2 in struc_neighbor1[n1]:
-                big_graph[G1_dict[n1]][G2_dict[n2]+G1_nodes_numb] = 1
-                big_graph[G2_dict[n2]+G1_nodes_numb][G1_dict[n1]] = 1
-
-        for n2 in struc_neighbor2:
-            for n1 in struc_neighbor2[n2]:
-                big_graph[G1_dict[n1]][G2_dict[n2]+G1_nodes_numb] = 1
-                big_graph[G2_dict[n2]+G1_nodes_numb][G1_dict[n1]] = 1
 
         print('big_graph.sum()')
         print(big_graph.sum())
