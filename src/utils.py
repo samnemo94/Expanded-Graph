@@ -450,14 +450,14 @@ def evaluate_lp(G1, G2, model, mul):
                                   model.wv[str(edge[0])] * model.wv[str(edge[1])]]) for edge in G1_train_edges_true]
     embedding1 += [np.concatenate([model.wv[str(edge[0])], model.wv[str(edge[1])],
                                    model.wv[str(edge[0])] * model.wv[str(edge[1])]]) for edge in G1_train_edges_false]
-    label1 = [1] * (len(G1_train_edges_true) + len(G1_train_edges_false)) + [0] * len(G1_train_edges_false)
+    label1 = [1] * len(G1_train_edges_true) + [0] * len(G1_train_edges_false)
 
     G2_train_edges_true, G2_train_edges_false, G2_test_edges_true, G2_test_edges_false = edge_sample_evaluate(G2,0.75)
     embedding2 = [np.concatenate([model.wv[str(edge[0] + mul + 1)], model.wv[str(edge[1] + mul + 1)],
                                   model.wv[str(edge[0] + mul + 1)] * model.wv[str(edge[1] + mul + 1)]]) for edge in G2_train_edges_true]
     embedding2 += [np.concatenate([model.wv[str(edge[0] + mul + 1)], model.wv[str(edge[1] + mul + 1)],
                                   model.wv[str(edge[0] + mul + 1)] * model.wv[str(edge[1] + mul + 1)]]) for edge in G2_train_edges_false]
-    label2 = [1] * (len(G2_train_edges_true) + len(G2_train_edges_false)) + [0] * len(G2_train_edges_false)
+    label2 = [1] * len(G2_train_edges_true) + [0] * len(G2_train_edges_false)
 
     embedding = embedding1 + embedding2
     label = label1 + label2
@@ -470,13 +470,13 @@ def evaluate_lp(G1, G2, model, mul):
                                   model.wv[str(edge[0])] * model.wv[str(edge[1])]]) for edge in G1_test_edges_true]
     embedding1 += [np.concatenate([model.wv[str(edge[0])], model.wv[str(edge[1])],
                                    model.wv[str(edge[0])] * model.wv[str(edge[1])]]) for edge in G1_test_edges_false]
-    label1 = [1] * (len(G1_test_edges_true) + len(G1_test_edges_false)) + [0] * len(G1_test_edges_false)
+    label1 = [1] * len(G1_test_edges_true) + [0] * len(G1_test_edges_false)
 
     embedding2 = [np.concatenate([model.wv[str(edge[0] + mul + 1)], model.wv[str(edge[1] + mul + 1)],
                                   model.wv[str(edge[0] + mul + 1)] * model.wv[str(edge[1] + mul + 1)]]) for edge in G2_test_edges_true]
     embedding2 += [np.concatenate([model.wv[str(edge[0] + mul + 1)], model.wv[str(edge[1] + mul + 1)],
                                   model.wv[str(edge[0] + mul + 1)] * model.wv[str(edge[1] + mul + 1)]]) for edge in G2_test_edges_false]
-    label2 = [1] * (len(G2_test_edges_true) + len(G2_test_edges_false)) + [0] * len(G2_test_edges_false)
+    label2 = [1] * len(G2_test_edges_true) + [0] * len(G2_test_edges_false)
 
     embedding = embedding1 + embedding2
     label = label1 + label2
