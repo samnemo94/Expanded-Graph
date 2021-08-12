@@ -503,11 +503,11 @@ def evaluate_lp(G1, G2, emb, mul):
 
     val_preds = edge_classifier.predict_proba(embedding)[:, 1]
     auc_score = roc_auc_score(label, val_preds)
-    print('LP AUC Score : {}'.format(auc_score), end='\t')
+    print('LP AUC Score : {}'.format(auc_score))
 
     for i in range(len(val_preds)):
         val_preds[i] = round(val_preds[i])
     precision = precision_score(label, val_preds)
     recall = recall_score(label, val_preds)
-    print('LP PRECISION : {}'.format(precision), end='\t')
-    print('LP RECALL : {}'.format(recall), end='\t')
+    print('LP PRECISION : {}'.format(precision))
+    print('LP RECALL : {}'.format(recall))
