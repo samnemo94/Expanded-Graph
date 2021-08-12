@@ -37,13 +37,13 @@ def structing(layers, G1, G2, G1_degree_dict, G2_degree_dict, attribute, alpha, 
     struc_neighbor_sim2 = {}
     for i in range(G1.number_of_nodes()):
         pp = pp_dist_df.iloc[i, np.argsort(-pp_dist_df.iloc[i, :])]
-        struc_neighbor1[G1_nodes[i]] = list(pp.index[:10])
-        struc_neighbor_sim1[G1_nodes[i]] = np.array(pp[:10])
+        struc_neighbor1[G1_nodes[i]] = list(pp.index[:int(G1.degree()[G1_nodes[i]]/2)])
+        struc_neighbor_sim1[G1_nodes[i]] = np.array(pp[:int(G1.degree()[G1_nodes[i]]/2)])
         struc_neighbor_sim1[G1_nodes[i]] /= np.sum(struc_neighbor_sim1[G1_nodes[i]])
     pp_dist_df = pp_dist_df.transpose()
     for i in range(G2.number_of_nodes()):
         pp = pp_dist_df.iloc[i, np.argsort(-pp_dist_df.iloc[i, :])]
-        struc_neighbor2[G2_nodes[i]] = list(pp.index[:10])
-        struc_neighbor_sim2[G2_nodes[i]] = np.array(pp[:10])
+        struc_neighbor2[G2_nodes[i]] = list(pp.index[:int(G2.degree()[G2_nodes[i]]/2)])
+        struc_neighbor_sim2[G2_nodes[i]] = np.array(pp[:int(G2.degree()[G2_nodes[i]]/2)])
         struc_neighbor_sim2[G2_nodes[i]] /= np.sum(struc_neighbor_sim2[G2_nodes[i]])
     return struc_neighbor1, struc_neighbor2, struc_neighbor_sim1, struc_neighbor_sim2
