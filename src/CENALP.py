@@ -228,7 +228,7 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
         print('Precision : %.2f%%\tRecall :  %.2f%%' % (precision, recall))
         print('Link Precision:: %.2f%%\tRecall :  %.2f%%' % (precision2, recall2))
 
-        evaluate_lp(G1, G2, emb, mul)
+        # evaluate_lp(G1, G2, emb, mul)
 
     # embedding1 = np.array([model.wv[str(x)] for x in list(G1.nodes())])
     # embedding2 = np.array([model.wv[str(x + mul + 1)] for x in list(G2.nodes())])
