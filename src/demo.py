@@ -60,6 +60,28 @@ def main(args):
     print(args)
     alignment_dict, alignment_dict_reversed = read_alignment(args.alignment_folder, args.filename)
     G1, G2 = loadG(args.data_folder, args.filename)
+    # G1_nodes_list = list(G1.nodes())
+    # G2_nodes_list = list(G2.nodes())
+    # for node in G1_nodes_list:
+    #     if not node in alignment_dict:
+    #         G1.remove_node(node)
+    #
+    # for node in G2_nodes_list:
+    #     if not node in alignment_dict_reversed:
+    #         G2.remove_node(node)
+    #
+    # with open('111.txt', 'w') as file:
+    #     for edge in G1.edges():
+    #         line = str(edge[0]) + ', ' + str(edge[1])
+    #         line += '\n'
+    #         file.write(line)
+    # with open('222.txt', 'w') as file:
+    #     for edge in G2.edges():
+    #         line = str(edge[0]) + ', ' + str(edge[1])
+    #         line += '\n'
+    #         file.write(line)
+    # print(len(G1.nodes()))
+    # print(len(G2.nodes()))
     attribute, attr1, attr2 = read_attribute(args.attribute_folder, args.filename, G1, G2)
     start_time = time.time()
     S, precision, seed_l1, seed_l2 = CENALP(G1, G2, args.q, attr1, attr2, attribute, alignment_dict, alignment_dict_reversed,
