@@ -6,15 +6,19 @@ import pandas as pd
 from utils import *
 import warnings
 import argparse
+
 warnings.filterwarnings('ignore')
+
+
 def read_alignment(alignment_folder, filename):
-    alignment = pd.read_csv(alignment_folder + filename + '.csv', header = None)
+    alignment = pd.read_csv(alignment_folder + filename + '.csv', header=None)
     alignment_dict = {}
     alignment_dict_reversed = {}
     for i in range(len(alignment)):
         alignment_dict[alignment.iloc[i, 0]] = alignment.iloc[i, 1]
         alignment_dict_reversed[alignment.iloc[i, 1]] = alignment.iloc[i, 0]
     return alignment_dict, alignment_dict_reversed
+
 
 def read_attribute(attribute_folder, filename, G1, G2):
     try:
@@ -26,17 +30,19 @@ def read_attribute(attribute_folder, filename, G1, G2):
         attribute = []
         print('Attribute files not found.')
     return attribute, attr1, attr2
+
+
 def parse_args():
     '''
     Parses the CLF arguments.
     '''
     parser = argparse.ArgumentParser(description="Run CENALP.")
-    parser.add_argument('--attribute_folder', nargs='?', default='../attribute/', 
+    parser.add_argument('--attribute_folder', nargs='?', default='../attribute/',
                         help='Input attribute path')
-    
-    parser.add_argument('--data_folder', nargs='?', default='../graph/', 
+
+    parser.add_argument('--data_folder', nargs='?', default='../graph/',
                         help='Input graph data path')
-    parser.add_argument('--alignment_folder', nargs='?', default='../alignment/', 
+    parser.add_argument('--alignment_folder', nargs='?', default='../alignment/',
                         help='Input ground truth alignment path')
     parser.add_argument('--filename', nargs='?', default='bigtoy',
                         help='Name of file')
@@ -47,14 +53,48 @@ def parse_args():
     parser.add_argument('--align_train_prop', type=float, default=0.0,
                         help="Proportion of training set. 0 represents unsupervised learning.")
     parser.add_argument('--q', type=float, default=0.5,
-                        help="Probability of walking to the separate network during random walk")    
+                        help="Probability of walking to the separate network during random walk")
     parser.add_argument('--c', type=float, default=0.5,
-                        help="Weight between sub-graph similarity and attribute similarity")    
+                        help="Weight between sub-graph similarity and attribute similarity")
     parser.add_argument('--multi_walk', type=bool, default=False,
                         help="Whether to use multi-processing")
     parser.add_argument('--neg_sampling', type=bool, default=False,
                         help="Use Negative Sampling")
     return parser.parse_args()
+
+def generateXnodesFromGraph(G1,G2,alignment_dict):
+    startingNodeIndex = random.randint(0, len(G1.nodes()) - 1)
+    nodes = set()
+    currentNode = list(G1.nodes())[startingNodeIndex]
+    while len(nodes) < 2100:
+        nodes.add(currentNode)
+        toIndex = random.randint(0, len(list(G1.neighbors(currentNode))) - 1)
+        currentNode = list(G1.neighbors(currentNode))[toIndex]
+
+    with open('DBLP2100_1.edges', 'w') as file:
+        for edge in G1.edges():
+            if edge[0] in nodes and edge[1] in nodes:
+                line = str(edge[0]) + ', ' + str(edge[1])
+                line += '\n'
+                file.write(line)
+
+    with open('DBLP2100_.csv', 'w') as file:
+        for node in nodes:
+            line = str(node) + ', ' + str(alignment_dict[node])
+            line += '\n'
+            file.write(line)
+
+    G2_nodes = []
+    for node in nodes:
+        G2_nodes.append(alignment_dict[node])
+
+    with open('DBLP2100_2.edges', 'w') as file:
+        for edge in G2.edges():
+            if edge[0] in G2_nodes and edge[1] in G2_nodes:
+                line = str(edge[0]) + ', ' + str(edge[1])
+                line += '\n'
+                file.write(line)
+    print('ssssss')
 
 def main(args):
     print(args)
@@ -90,8 +130,3 @@ def main(args):
 if __name__ == '__main__':
     args = parse_args()
     main(args)
-    
-
-    
-    
-    
