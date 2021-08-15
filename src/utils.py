@@ -360,16 +360,16 @@ def edge_sample_evaluate(G, ratio):
 def seed_link_lr(emb, G1, G2, seed_list1, seed_list2, mul, test_edges_final1, test_edges_final2, alignment_dict,
                  alignment_dict_reversed):
     train_edges_G1 = edge_sample(G1)
-    embedding1 = [np.concatenate([emb[list(G1.nodes()).index(edge[0])], emb[list(G1.nodes()).index(edge[1])],
-                                  emb[list(G1.nodes()).index(edge[0])] * emb[list(G1.nodes()).index(edge[1])]]) for edge
+    embedding1 = [np.concatenate([np.array(emb[list(G1.nodes()).index(edge[0])]).reshape(64), np.array(emb[list(G1.nodes()).index(edge[1])]).reshape(64),
+                                  np.array(emb[list(G1.nodes()).index(edge[0])]).reshape(64) * np.array(emb[list(G1.nodes()).index(edge[1])]).reshape(64)]) for edge
                   in train_edges_G1]
     label1 = [1] * G1.number_of_edges() + [0] * (len(train_edges_G1) - G1.number_of_edges())
 
     train_edges_G2 = edge_sample(G2)
     embedding2 = [np.concatenate(
-        [emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())], emb[list(G2.nodes()).index(edge[1]) + len(G1.nodes())],
-         emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())] * emb[
-             list(G2.nodes()).index(edge[1]) + len(G1.nodes())]]) for edge in
+        [np.array(emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())]).reshape(64), np.array(emb[list(G2.nodes()).index(edge[1]) + len(G1.nodes())]).reshape(64),
+         np.array(emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())]).reshape(64) * np.array(emb[
+             list(G2.nodes()).index(edge[1]) + len(G1.nodes())]).reshape(64)]) for edge in
                   train_edges_G2]
     label2 = [1] * G2.number_of_edges() + [0] * (len(train_edges_G2) - G2.number_of_edges())
 
@@ -388,13 +388,13 @@ def seed_link_lr(emb, G1, G2, seed_list1, seed_list2, mul, test_edges_final1, te
             if not G2.has_edge(seed_list2[i], seed_list2[j]) and G1.has_edge(seed_list1[i], seed_list1[j]):
                 test_edges2.append([min(seed_list2[i], seed_list2[j]), max(seed_list2[i], seed_list2[j])])
     test_edges1, test_edges2 = np.array(test_edges1), np.array(test_edges2)
-    embedding1 = [np.concatenate([emb[list(G1.nodes()).index(edge[0])], emb[list(G1.nodes()).index(edge[1])],
-                                  emb[list(G1.nodes()).index(edge[0])] * emb[list(G1.nodes()).index(edge[1])]]) for edge
+    embedding1 = [np.concatenate([np.array(emb[list(G1.nodes()).index(edge[0])]).reshape(64), np.array(emb[list(G1.nodes()).index(edge[1])]).reshape(64),
+                                  np.array(emb[list(G1.nodes()).index(edge[0])]).reshape(64) * np.array(emb[list(G1.nodes()).index(edge[1])]).reshape(64)]) for edge
                   in test_edges1]
     embedding2 = [np.concatenate(
-        [emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())], emb[list(G2.nodes()).index(edge[1]) + len(G1.nodes())],
-         emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())] * emb[
-             list(G2.nodes()).index(edge[1]) + len(G1.nodes())]]) for edge in
+        [np.array(emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())]).reshape(64), np.array(emb[list(G2.nodes()).index(edge[1]) + len(G1.nodes())]).reshape(64),
+         np.array(emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())]).reshape(64) * np.array(emb[
+             list(G2.nodes()).index(edge[1]) + len(G1.nodes())]).reshape(64)]) for edge in
                   test_edges2]
     if len(embedding1) != 0:
         val_preds1 = edge_classifier.predict_proba(embedding1)[:, 1]
@@ -428,62 +428,3 @@ def seed_link_lr(emb, G1, G2, seed_list1, seed_list2, mul, test_edges_final1, te
     return pred1, pred2
 
 
-def evaluate_lp(G1, G2, emb, mul):
-    G1_train_edges_true, G1_train_edges_false, G1_test_edges_true, G1_test_edges_false = edge_sample_evaluate(G1, 0.75)
-    embedding1 = [np.concatenate([emb[list(G1.nodes()).index(edge[0])], emb[list(G1.nodes()).index(edge[1])],
-                                  emb[list(G1.nodes()).index(edge[0])] * emb[list(G1.nodes()).index(edge[1])]]) for edge
-                  in G1_train_edges_true]
-    embedding1 += [np.concatenate([emb[list(G1.nodes()).index(edge[0])], emb[list(G1.nodes()).index(edge[1])],
-                                   emb[list(G1.nodes()).index(edge[0])] * emb[list(G1.nodes()).index(edge[1])]]) for
-                   edge in G1_train_edges_false]
-    label1 = [1] * len(G1_train_edges_true) + [0] * len(G1_train_edges_false)
-
-    G2_train_edges_true, G2_train_edges_false, G2_test_edges_true, G2_test_edges_false = edge_sample_evaluate(G2, 0.75)
-    embedding2 = [np.concatenate(
-        [emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())], emb[list(G2.nodes()).index(edge[1]) + len(G1.nodes())],
-         emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())] * emb[
-             list(G2.nodes()).index(edge[1]) + len(G1.nodes())]]) for edge in G2_train_edges_true]
-    embedding2 += [np.concatenate(
-        [emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())], emb[list(G2.nodes()).index(edge[1]) + len(G1.nodes())],
-         emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())] * emb[
-             list(G2.nodes()).index(edge[1]) + len(G1.nodes())]]) for edge in G2_train_edges_false]
-    label2 = [1] * len(G2_train_edges_true) + [0] * len(G2_train_edges_false)
-
-    embedding = embedding1 + embedding2
-    label = label1 + label2
-
-    edge_classifier = LogisticRegression(solver='liblinear', random_state=0)
-    edge_classifier.fit(np.array(embedding), label)
-
-    # testing
-    embedding1 = [np.concatenate([emb[list(G1.nodes()).index(edge[0])], emb[list(G1.nodes()).index(edge[1])],
-                                  emb[list(G1.nodes()).index(edge[0])] * emb[list(G1.nodes()).index(edge[1])]]) for edge
-                  in G1_test_edges_true]
-    embedding1 += [np.concatenate([emb[list(G1.nodes()).index(edge[0])], emb[list(G1.nodes()).index(edge[1])],
-                                   emb[list(G1.nodes()).index(edge[0])] * emb[list(G1.nodes()).index(edge[1])]]) for
-                   edge in G1_test_edges_false]
-    label1 = [1] * len(G1_test_edges_true) + [0] * len(G1_test_edges_false)
-
-    embedding2 = [np.concatenate(
-        [emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())], emb[list(G2.nodes()).index(edge[1]) + len(G1.nodes())],
-         emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())] * emb[
-             list(G2.nodes()).index(edge[1]) + len(G1.nodes())]]) for edge in G2_test_edges_true]
-    embedding2 += [np.concatenate(
-        [emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())], emb[list(G2.nodes()).index(edge[1]) + len(G1.nodes())],
-         emb[list(G2.nodes()).index(edge[0]) + len(G1.nodes())] * emb[
-             list(G2.nodes()).index(edge[1]) + len(G1.nodes())]]) for edge in G2_test_edges_false]
-    label2 = [1] * len(G2_test_edges_true) + [0] * len(G2_test_edges_false)
-
-    embedding = embedding1 + embedding2
-    label = label1 + label2
-
-    val_preds = edge_classifier.predict_proba(embedding)[:, 1]
-    auc_score = roc_auc_score(label, val_preds)
-    print('LP AUC Score : {}'.format(auc_score))
-
-    for i in range(len(val_preds)):
-        val_preds[i] = round(val_preds[i])
-    precision = precision_score(label, val_preds)
-    recall = recall_score(label, val_preds)
-    print('LP PRECISION : {}'.format(precision))
-    print('LP RECALL : {}'.format(recall))

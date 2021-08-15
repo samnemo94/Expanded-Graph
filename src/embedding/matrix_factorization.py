@@ -1,12 +1,15 @@
 import os
 import sys
+
+import numpy
+from numpy import linalg
+
+from .similarity_measure import compute_sum_power_tran
+
 sys.path.append('./')
 sys.path.append(os.path.realpath(__file__))
 
-import torch
-from torch.utils.tensorboard import SummaryWriter
 from .static_graph_embedding import StaticGraphEmbedding
-from .similarity_measure import adjacency, laplacian, sym_normalized_laplacian, NetMF, compute_transition, compute_ppr ,compute_sum_power_tran#sum_power_tran, sim_rank ppr
 
 
 class MatrixFactorization(StaticGraphEmbedding):
@@ -23,7 +26,7 @@ class MatrixFactorization(StaticGraphEmbedding):
         self._embedding_dim = embedding_dimension
         self._similarity_measure = similarity_measure
         self._method_name = "Matrix_Fatorization"
-        self._setup_done = False # model input is not setup yet 
+        self._setup_done = False  # model input is not setup yet
 
     def setup_model_input(self, adj_mat, similarity_measure=None):
         '''
@@ -41,24 +44,12 @@ class MatrixFactorization(StaticGraphEmbedding):
         But class variable self._Mat is assigned the similarity measure in the form of a torch tensor.
         '''
 
-        if(similarity_measure):
+        if (similarity_measure):
             self._similarity_measure = similarity_measure
 
         # transform input matrix to correct similiarity measure
-        if (self._similarity_measure=="adjacency"):
-            self._Mat = adjacency(adj_mat)
-        if (self._similarity_measure=="laplacian"):
-            self._Mat = laplacian(adj_mat)
-        if (self._similarity_measure=="sym_normalized_laplacian"):
-            self._Mat = sym_normalized_laplacian(adj_mat)
-        if (self._similarity_measure=="transition"):
-            self._Mat = compute_transition(adj_mat)
-        if (self._similarity_measure=="NetMF"):
-            self._Mat = NetMF(adj_mat)
-        if (self._similarity_measure=="ppr"):
-             self._Mat = compute_ppr(adj_mat)
-        if (self._similarity_measure=="sum_power_tran"):
-             self._Mat = compute_sum_power_tran(adj_mat)
+        if (self._similarity_measure == "sum_power_tran"):
+            self._Mat = compute_sum_power_tran(adj_mat)
 
         self._setup_done = True
 
@@ -99,7 +90,6 @@ class MatrixFactorization(StaticGraphEmbedding):
         -
         '''
         self._summary_path = path
-        self._writer = SummaryWriter(self._summary_path)
 
     def get_summary_writer(self):
         '''   
@@ -120,12 +110,12 @@ class MatrixFactorization(StaticGraphEmbedding):
         if self._setup_done == False:
             raise ValueError('Model input parameters not defined.')
 
-        U,S,V = torch.svd(self._Mat)
+        U, S, V = linalg.svd(self._Mat)
 
-        V_trancated = V[:,:self._embedding_dim]
-        self._emb = torch.matmul(self._Mat, V_trancated)
+        V_trancated = V[:, :self._embedding_dim]
+        self._emb = numpy.matmul(self._Mat, V_trancated)
 
         # Put the embedding back on the CPU
-        emb_np = self._emb.cpu().detach().numpy()
+        emb_np = self._emb
 
         return emb_np

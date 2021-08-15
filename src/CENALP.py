@@ -4,8 +4,6 @@ from utils import *
 from walks import multi_simulate_walks, single_simulate_walks
 from sklearn.metrics.pairwise import cosine_similarity
 import warnings
-from embedding.bernoulli import Bernoulli
-from embedding.kl import KL
 from embedding.matrix_factorization import MatrixFactorization
 from scipy import sparse
 
@@ -108,14 +106,7 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
         print('big_graph.sum()')
         print(big_graph.sum())
 
-        if embedding_method_class == 'Bernoulli':
-            model_01 = Bernoulli(embedding_dimension=64, decoder=embedding_method_kind)
-        elif embedding_method_class == 'KL':
-            model_01 = KL(embedding_dimension=64, decoder='softmax', similarity_measure=embedding_method_kind)
-        elif embedding_method_class == 'MatrixFactorization':
-            model_01 = MatrixFactorization(embedding_dimension=64, similarity_measure=embedding_method_kind)
-
-        model_01.reset_epoch()
+        model_01 = MatrixFactorization(embedding_dimension=64, similarity_measure='sum_power_tran')
 
         s_big_graph = sparse.csr_matrix(big_graph)  # Here's the initialization of the sparse matrix.
         model_01.setup_model_input(s_big_graph)
@@ -149,8 +140,8 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
         # embedding1 = np.array([model.wv[str(x)] for x in index])
         # embedding2 = np.array([model.wv[str(x + mul + 1)] for x in columns])
 
-        embedding1 = np.array([emb[list(G1.nodes()).index(x)] for x in index])
-        embedding2 = np.array([emb[list(G2.nodes()).index(x) + G1_nodes_numb] for x in columns])
+        embedding1 = np.array([np.array(emb[list(G1.nodes()).index(x)]).reshape(64) for x in index])
+        embedding2 = np.array([np.array(emb[list(G2.nodes()).index(x) + G1_nodes_numb]).reshape(64) for x in columns])
 
         cos = cosine_similarity(embedding1, embedding2)
         adj_matrix = np.zeros((len(index) * len(columns), 3))
