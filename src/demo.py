@@ -66,23 +66,23 @@ def parse_args():
                         help="Embedding Kind")
     return parser.parse_args()
 
-def generateXnodesFromGraph(G1,G2,alignment_dict):
+def generateXnodesFromGraph(G1,G2,alignment_dict,size):
     startingNodeIndex = random.randint(0, len(G1.nodes()) - 1)
     nodes = set()
     currentNode = list(G1.nodes())[startingNodeIndex]
-    while len(nodes) < 2100:
+    while len(nodes) < size:
         nodes.add(currentNode)
         toIndex = random.randint(0, len(list(G1.neighbors(currentNode))) - 1)
         currentNode = list(G1.neighbors(currentNode))[toIndex]
 
-    with open('DBLP2100_1.edges', 'w') as file:
+    with open('DBLP' + str(size) + '_1.edges', 'w') as file:
         for edge in G1.edges():
             if edge[0] in nodes and edge[1] in nodes:
                 line = str(edge[0]) + ', ' + str(edge[1])
                 line += '\n'
                 file.write(line)
 
-    with open('DBLP2100_.csv', 'w') as file:
+    with open('DBLP' + str(size) + '_.csv', 'w') as file:
         for node in nodes:
             line = str(node) + ', ' + str(alignment_dict[node])
             line += '\n'
@@ -92,7 +92,7 @@ def generateXnodesFromGraph(G1,G2,alignment_dict):
     for node in nodes:
         G2_nodes.append(alignment_dict[node])
 
-    with open('DBLP2100_2.edges', 'w') as file:
+    with open('DBLP' + str(size) + '_2.edges', 'w') as file:
         for edge in G2.edges():
             if edge[0] in G2_nodes and edge[1] in G2_nodes:
                 line = str(edge[0]) + ', ' + str(edge[1])
@@ -104,6 +104,11 @@ def main(args):
     print(args)
     alignment_dict, alignment_dict_reversed = read_alignment(args.alignment_folder, args.filename)
     G1, G2 = loadG(args.data_folder, args.filename)
+    # generateXnodesFromGraph(G1, G2, alignment_dict, 0*400 + 500)
+    # generateXnodesFromGraph(G1, G2, alignment_dict, 1*400 + 500)
+    # generateXnodesFromGraph(G1, G2, alignment_dict, 2*400 + 500)
+    # generateXnodesFromGraph(G1, G2, alignment_dict, 3*400 + 500)
+    # generateXnodesFromGraph(G1, G2, alignment_dict, 4*400 + 500)
     # G1_nodes_list = list(G1.nodes())
     # G2_nodes_list = list(G2.nodes())
     # for node in G1_nodes_list:
