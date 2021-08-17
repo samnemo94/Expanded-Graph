@@ -55,32 +55,33 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
             
         columns = [x + mul + 1 for x in columns]
 
-        if k != 0:
-            print('structing...', end='')
-            G1_degree_dict = cal_degree_dict(list(G1.nodes()), G1, layer)
-            G2_degree_dict = cal_degree_dict(list(G2.nodes()), G2, layer)
-            struc_neighbor1, struc_neighbor2, struc_neighbor_sim1, struc_neighbor_sim2 = \
-                    structing(layer, G1, G2, G1_degree_dict, G2_degree_dict, attribute, alpha, c)
+        if iteration == 2:
+            if k != 0:
+                print('structing...', end='')
+                G1_degree_dict = cal_degree_dict(list(G1.nodes()), G1, layer)
+                G2_degree_dict = cal_degree_dict(list(G2.nodes()), G2, layer)
+                struc_neighbor1, struc_neighbor2, struc_neighbor_sim1, struc_neighbor_sim2 = \
+                        structing(layer, G1, G2, G1_degree_dict, G2_degree_dict, attribute, alpha, c)
+                print('finished!')
+            print('walking...', end='')
+            if multi_walk == True:
+                multi_simulate_walks(G1, G2, q, struc_neighbor1, struc_neighbor2,
+                                     struc_neighbor_sim1, struc_neighbor_sim2,
+                                     seed_list1, seed_list2,
+                                     num_walks = 20, walk_length = 80, workers = 20)
+            else:
+                single_simulate_walks(G1, G2, q, struc_neighbor1, struc_neighbor2,
+                                     struc_neighbor_sim1, struc_neighbor_sim2,
+                                     seed_list1, seed_list2,
+                                     num_walks = 20, walk_length = 80, workers = 20)
+            walks = LineSentence('random_walks.txt')
             print('finished!')
-        print('walking...', end='')
-        if multi_walk == True:
-            multi_simulate_walks(G1, G2, q, struc_neighbor1, struc_neighbor2, 
-                                 struc_neighbor_sim1, struc_neighbor_sim2, 
-                                 seed_list1, seed_list2,
-                                 num_walks = 20, walk_length = 80, workers = 20)
-        else:
-            single_simulate_walks(G1, G2, q, struc_neighbor1, struc_neighbor2, 
-                                 struc_neighbor_sim1, struc_neighbor_sim2, 
-                                 seed_list1, seed_list2,
-                                 num_walks = 20, walk_length = 80, workers = 20)
-        walks = LineSentence('random_walks.txt')
-        print('finished!')
-        print('embedding...', end='')
-        if neg_sampling:
-            model = Word2Vec(walks, size=64, window=5, min_count=0, hs=0, negative=10, sg=1, workers=32, iter=5)
-        else:
-            model = Word2Vec(walks, size=64, window=5, min_count=0, hs=1, sg=1, workers=32, iter=5)
-        print('finished!')
+            print('embedding...', end='')
+            if neg_sampling:
+                model = Word2Vec(walks, size=64, window=5, min_count=0, hs=0, negative=10, sg=1, workers=32, iter=5)
+            else:
+                model = Word2Vec(walks, size=64, window=5, min_count=0, hs=1, sg=1, workers=32, iter=5)
+            print('finished!')
         if len(columns) == 0 or len(index) == 0:
             break
         if len(alignment_dict) == len(seed_list1):
