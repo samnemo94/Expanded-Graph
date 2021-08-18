@@ -64,62 +64,63 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
 
         columns = [x + mul + 1 for x in columns]
 
-        if k != 0:
-            print('structing...', end='')
-            G1_degree_dict = cal_degree_dict(list(G1.nodes()), G1, layer)
-            G2_degree_dict = cal_degree_dict(list(G2.nodes()), G2, layer)
-            struc_neighbor1, struc_neighbor2, struc_neighbor_sim1, struc_neighbor_sim2 = \
-                structing(layer, G1, G2, G1_degree_dict, G2_degree_dict, attribute, alpha, c)
-            print('finished!')
+        if iteration == 2:
+            # if k != 0:
+            #     print('structing...', end='')
+            #     G1_degree_dict = cal_degree_dict(list(G1.nodes()), G1, layer)
+            #     G2_degree_dict = cal_degree_dict(list(G2.nodes()), G2, layer)
+            #     struc_neighbor1, struc_neighbor2, struc_neighbor_sim1, struc_neighbor_sim2 = \
+            #         structing(layer, G1, G2, G1_degree_dict, G2_degree_dict, attribute, alpha, c)
+            #     print('finished!')
 
-        G1_nodes_numb = len(G1.nodes())
-        G2_nodes_numb = len(G2.nodes())
+            G1_nodes_numb = len(G1.nodes())
+            G2_nodes_numb = len(G2.nodes())
 
-        big_graph = np.zeros((G1_nodes_numb + G2_nodes_numb, G1_nodes_numb + G2_nodes_numb))
-        G1_dict = {}
-        for i in range(len(list(G1.nodes()))):
-            G1_dict[list(G1.nodes())[i]] = i
-        G2_dict = {}
-        for i in range(len(list(G2.nodes()))):
-            G2_dict[list(G2.nodes())[i]] = i
+            big_graph = np.zeros((G1_nodes_numb + G2_nodes_numb, G1_nodes_numb + G2_nodes_numb))
+            G1_dict = {}
+            for i in range(len(list(G1.nodes()))):
+                G1_dict[list(G1.nodes())[i]] = i
+            G2_dict = {}
+            for i in range(len(list(G2.nodes()))):
+                G2_dict[list(G2.nodes())[i]] = i
 
-        for edge in G1.edges():
-            big_graph[G1_dict[edge[0]]][G1_dict[edge[1]]] = 1
-            big_graph[G1_dict[edge[1]]][G1_dict[edge[0]]] = 1
+            for edge in G1.edges():
+                big_graph[G1_dict[edge[0]]][G1_dict[edge[1]]] = 1
+                big_graph[G1_dict[edge[1]]][G1_dict[edge[0]]] = 1
 
-        for edge in G2.edges():
-            big_graph[G2_dict[edge[0]] + G1_nodes_numb][G2_dict[edge[1]] + G1_nodes_numb] = 1
-            big_graph[G2_dict[edge[1]] + G1_nodes_numb][G2_dict[edge[0]] + G1_nodes_numb] = 1
+            for edge in G2.edges():
+                big_graph[G2_dict[edge[0]] + G1_nodes_numb][G2_dict[edge[1]] + G1_nodes_numb] = 1
+                big_graph[G2_dict[edge[1]] + G1_nodes_numb][G2_dict[edge[0]] + G1_nodes_numb] = 1
 
-        for i in range(len(seed_list1)):
-            big_graph[G1_dict[seed_list1[i]]][G2_dict[seed_list2[i]] + G1_nodes_numb] = 1
-            big_graph[G2_dict[seed_list2[i]] + G1_nodes_numb][G1_dict[seed_list1[i]]] = 1
+            for i in range(len(seed_list1)):
+                big_graph[G1_dict[seed_list1[i]]][G2_dict[seed_list2[i]] + G1_nodes_numb] = 1
+                big_graph[G2_dict[seed_list2[i]] + G1_nodes_numb][G1_dict[seed_list1[i]]] = 1
 
-        for n1 in struc_neighbor1:
-            for n2 in struc_neighbor1[n1]:
-                big_graph[G1_dict[n1]][G2_dict[n2] + G1_nodes_numb] = 1
-                big_graph[G2_dict[n2] + G1_nodes_numb][G1_dict[n1]] = 1
+            # for n1 in struc_neighbor1:
+            #     for n2 in struc_neighbor1[n1]:
+            #         big_graph[G1_dict[n1]][G2_dict[n2] + G1_nodes_numb] = 1
+            #         big_graph[G2_dict[n2] + G1_nodes_numb][G1_dict[n1]] = 1
+            #
+            # for n2 in struc_neighbor2:
+            #     for n1 in struc_neighbor2[n2]:
+            #         big_graph[G1_dict[n1]][G2_dict[n2] + G1_nodes_numb] = 1
+            #         big_graph[G2_dict[n2] + G1_nodes_numb][G1_dict[n1]] = 1
 
-        for n2 in struc_neighbor2:
-            for n1 in struc_neighbor2[n2]:
-                big_graph[G1_dict[n1]][G2_dict[n2] + G1_nodes_numb] = 1
-                big_graph[G2_dict[n2] + G1_nodes_numb][G1_dict[n1]] = 1
+            print('big_graph.sum()')
+            print(big_graph.sum())
 
-        print('big_graph.sum()')
-        print(big_graph.sum())
+            if embedding_method_class == 'Bernoulli':
+                model_01 = Bernoulli(embedding_dimension=64, decoder=embedding_method_kind)
+            elif embedding_method_class == 'KL':
+                model_01 = KL(embedding_dimension=64, decoder='softmax', similarity_measure=embedding_method_kind)
+            elif embedding_method_class == 'MatrixFactorization':
+                model_01 = MatrixFactorization(embedding_dimension=64, similarity_measure=embedding_method_kind)
 
-        if embedding_method_class == 'Bernoulli':
-            model_01 = Bernoulli(embedding_dimension=64, decoder=embedding_method_kind)
-        elif embedding_method_class == 'KL':
-            model_01 = KL(embedding_dimension=64, decoder='softmax', similarity_measure=embedding_method_kind)
-        elif embedding_method_class == 'MatrixFactorization':
-            model_01 = MatrixFactorization(embedding_dimension=64, similarity_measure=embedding_method_kind)
+            model_01.reset_epoch()
 
-        model_01.reset_epoch()
-
-        s_big_graph = sparse.csr_matrix(big_graph)  # Here's the initialization of the sparse matrix.
-        model_01.setup_model_input(s_big_graph)
-        emb = model_01.learn_embedding(10000)
+            s_big_graph = sparse.csr_matrix(big_graph)  # Here's the initialization of the sparse matrix.
+            model_01.setup_model_input(s_big_graph)
+            emb = model_01.learn_embedding(10000)
 
         # print('walking...', end='')
         # if multi_walk == True:
