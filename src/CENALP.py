@@ -206,8 +206,14 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
         G2.add_edges_from(pred2)
         print('Add seed links: {}'.format(len(pred1) + len(pred2)))
 
-        pred_list1 += list([[alignment_dict[edge[0]], alignment_dict[edge[1]]] for edge in pred1])
-        pred_list2 += list([[alignment_dict_reversed[edge[0]], alignment_dict_reversed[edge[1]]] for edge in pred2])
+        # pred_list1 += list([[alignment_dict[edge[0]], alignment_dict[edge[1]]] for edge in pred1])
+        # pred_list2 += list([[alignment_dict_reversed[edge[0]], alignment_dict_reversed[edge[1]]] for edge in pred2])
+        for edge in pred1:
+            if alignment_dict.get(edge[0], -1) != -1 and alignment_dict.get(edge[1], -1) != -1:
+                pred_list1 += [[alignment_dict[edge[0]], alignment_dict[edge[1]]]]
+        for edge in pred2:
+            if alignment_dict_reversed.get(edge[0], -1) != -1 and alignment_dict_reversed.get(edge[1], -1) != -1:
+                pred_list2 += [[alignment_dict_reversed[edge[0]], alignment_dict_reversed[edge[1]]]]
 
         sub1 = np.sum([G1.has_edge(edge[0], edge[1]) for edge in pred_list2])
         sub2 = np.sum([G2.has_edge(edge[0], edge[1]) for edge in pred_list1])
