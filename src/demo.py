@@ -100,6 +100,15 @@ def main(args):
     print(args)
     alignment_dict, alignment_dict_reversed = read_alignment(args.alignment_folder, args.filename)
     G1, G2 = loadG(args.data_folder, args.filename)
+
+    # counter = 0
+    # for edge in G1.edges():
+    #     if G2.has_edge(alignment_dict.get(edge[0],-1),alignment_dict.get(edge[1],-1)):
+    #         counter+=1
+    # print('ddddddddddddd')
+    # print((2*counter)/(len(G1.edges()) + len(G2.edges())))
+
+
     # generateXnodesFromGraph(G1, G2, alignment_dict, 0*400 + 500)
     # generateXnodesFromGraph(G1, G2, alignment_dict, 1*400 + 500)
     # generateXnodesFromGraph(G1, G2, alignment_dict, 2*400 + 500)
