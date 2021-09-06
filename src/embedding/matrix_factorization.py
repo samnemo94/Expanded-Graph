@@ -10,7 +10,7 @@ from .similarity_measure import adjacency, laplacian, sym_normalized_laplacian, 
     compute_sum_power_tran  # sum_power_tran, sim_rank ppr
 import torch
 import tensorly as tl
-from gpu_hosvd import gpu_tsvd
+from .gpu_hosvd import gpu_tsvd
 
 torch.set_default_tensor_type(torch.cuda.FloatTensor)
 tl.set_backend('pytorch')
