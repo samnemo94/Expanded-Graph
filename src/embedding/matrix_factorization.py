@@ -1,5 +1,8 @@
 import os
 import sys
+
+from .gpu_hosvd import gpu_tsvd
+
 sys.path.append('./')
 sys.path.append(os.path.realpath(__file__))
 
@@ -120,9 +123,9 @@ class MatrixFactorization(StaticGraphEmbedding):
         if self._setup_done == False:
             raise ValueError('Model input parameters not defined.')
 
-        U,S,V = torch.svd(self._Mat)
+        U, S, V_trancated = gpu_tsvd(self._Mat, self._embedding_dim)
+        V_trancated = torch.transpose(V_trancated, 0, 1)
 
-        V_trancated = V[:,:self._embedding_dim]
         self._emb = torch.matmul(self._Mat, V_trancated)
 
         # Put the embedding back on the CPU
