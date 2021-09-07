@@ -31,17 +31,17 @@ def cpu_tsvd(
 
     # Power iterations
     for _ in range(n_iter):
-        Q = (Q.t() @ A).t()
+        Q = (Q.transpose() @ A).transpose()
         Q, _ = np.linalg.qr(Q)
         Q = A @ Q
         Q, _ = np.linalg.qr(Q)
 
-    QA = Q.t() @ A
+    QA = Q.transpose() @ A
     # Transpose QA to make it tall-skinny as MAGMA has optimisations for this
     # (USVt)t = VStUt
-    Va, s, R = np.linalg.svd(QA.t())
-    U = Q @ R.t()
+    Va, s, R = np.linalg.svd(QA.transpose())
+    U = Q @ R.transpose()
 
-    return U[:, :k], s[:k], Va.t()[:k, :]
+    return U[:, :k], s[:k], Va.transpose()[:k, :]
 
 
