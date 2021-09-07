@@ -10,6 +10,7 @@ sys.path.append('./')
 sys.path.append(os.path.realpath(__file__))
 
 from .static_graph_embedding import StaticGraphEmbedding
+from .cpu_hosvd import cpu_tsvd
 
 
 class MatrixFactorization(StaticGraphEmbedding):
@@ -110,6 +111,8 @@ class MatrixFactorization(StaticGraphEmbedding):
         if self._setup_done == False:
             raise ValueError('Model input parameters not defined.')
 
+        U, S, V_trancated = cpu_tsvd(self._Mat, self._embedding_dim)
+        V_trancated = V_trancated.transpose()
         U, S, V = linalg.svd(self._Mat)
 
         V_trancated = V[:, :self._embedding_dim]
