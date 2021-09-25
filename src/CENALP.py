@@ -21,7 +21,7 @@ alignment_folder = '../alignment/'
 
 
 def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_reversed,
-           layer, align_train_prop, alpha, c, multi_walk, neg_sampling=False, embedding_method_class = '', embedding_method_kind = ''):
+           th, layer, align_train_prop, alpha, c, multi_walk, neg_sampling=False, embedding_method_class = '', embedding_method_kind = ''):
     iteration = 1
     anchor = 0
     mul = int(np.max([np.max(G1.nodes()), np.max(G2.nodes())]))
@@ -209,7 +209,7 @@ def CENALP(G1, G2, q, attr1, attr2, attribute, alignment_dict, alignment_dict_re
         recall = 100 * count / (len(alignment_dict) - seed_list_num)
 
         pred1, pred2 = seed_link_lr(emb, G1, G2, seed_list1, seed_list2,
-                                    mul, test_edges_final1, test_edges_final2, alignment_dict, alignment_dict_reversed)
+                                    th, mul, test_edges_final1, test_edges_final2, alignment_dict, alignment_dict_reversed)
 
         G1.add_edges_from(pred1)
         G2.add_edges_from(pred2)

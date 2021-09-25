@@ -357,7 +357,7 @@ def edge_sample_evaluate(G, ratio):
     return train_edges_true, train_edges_false, test_edges_true, test_edges_false
 
 
-def seed_link_lr(emb, G1, G2, seed_list1, seed_list2, mul, test_edges_final1, test_edges_final2, alignment_dict,
+def seed_link_lr(emb, G1, G2, seed_list1, seed_list2, th, mul, test_edges_final1, test_edges_final2, alignment_dict,
                  alignment_dict_reversed):
     train_edges_G1 = edge_sample(G1)
     embedding1 = [np.concatenate([emb[list(G1.nodes()).index(edge[0])], emb[list(G1.nodes()).index(edge[1])],
@@ -398,12 +398,12 @@ def seed_link_lr(emb, G1, G2, seed_list1, seed_list2, mul, test_edges_final1, te
                   test_edges2]
     if len(embedding1) != 0:
         val_preds1 = edge_classifier.predict_proba(embedding1)[:, 1]
-        pred1 = test_edges1[val_preds1 > 0.5]
+        pred1 = test_edges1[val_preds1 > th]
     else:
         pred1 = []
     if len(embedding2) != 0:
         val_preds2 = edge_classifier.predict_proba(embedding2)[:, 1]
-        pred2 = test_edges2[val_preds2 > 0.5]
+        pred2 = test_edges2[val_preds2 > th]
     else:
         pred2 = []
 

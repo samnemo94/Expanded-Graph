@@ -50,6 +50,8 @@ def parse_args():
                         help="Hyperparameter controlling the distribution of vertices' similairties")
     parser.add_argument('--layer', type=int, default=3,
                         help="Depth of neighbors")
+    parser.add_argument('--lp_threshold', type=float, default=0.5,
+                        help="Threshold of Link Prediction")
     parser.add_argument('--align_train_prop', type=float, default=0.0,
                         help="Proportion of training set. 0 represents unsupervised learning.")
     parser.add_argument('--q', type=float, default=0.5,
@@ -143,7 +145,7 @@ def main(args):
     attribute, attr1, attr2 = read_attribute(args.attribute_folder, args.filename, G1, G2)
     start_time = time.time()
     S, precision, seed_l1, seed_l2 = CENALP(G1, G2, args.q, attr1, attr2, attribute, alignment_dict, alignment_dict_reversed, 
-       args.layer, args.align_train_prop, args.alpha, args.c, args.multi_walk,args.neg_sampling,args.embedding_method_class,args.embedding_method_kind)
+       args.lp_threshold, args.layer, args.align_train_prop, args.alpha, args.c, args.multi_walk,args.neg_sampling,args.embedding_method_class,args.embedding_method_kind)
     print("--- %s seconds ---" % (time.time() - start_time))
 
 if __name__ == '__main__':
