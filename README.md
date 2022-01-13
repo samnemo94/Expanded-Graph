@@ -10,8 +10,8 @@ The branches are organized as follows:
 - EG-CPU: CPU implementation of EG 
 - EG-Truncated: GPU implementation of EG with the truncated version of SVD
 - EG-Truncated-CPU: CPU implementation of EG-Truncated
-- EG-Mini: EG-Mini according to the paper
-- EG-Mini-CPU: CPU implementation of EG-Mini
+- EG-Mini_Truncated: EG-Mini according to the paper
+- EG-Mini-CPU: CPU implementation of EG-Mini_Truncated
 - CENALP: https://github.com/deepopo/CENALP
 
 
