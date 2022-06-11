@@ -1,6 +1,8 @@
 # EG (Expanded Graph)
 This repository contains the code of paper:  
- >****** Not published yet   
+ >https://journalofbigdata.springeropen.com/articles/10.1186/s40537-022-00595-2
+ >Expanded graph embedding for joint network alignment and link prediction
+ 
  
 This repository is forked from https://github.com/deepopo/CENALP
 
